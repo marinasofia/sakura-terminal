@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- ✿ claude live panel. Local only: no network, no links, everything is drawn with textContent. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<style>
+  :root {
+    --bg: rgba(42, 26, 38, 0.94); --card: rgba(61, 40, 55, 0.72); --line: #4a3143;
+    --fg: #f3dde4; --dim: #8a6d7c; --rose: #f49ab0; --green: #8fbb96; --gold: #dfb06a; --blue: #9fb0d8; --lilac: #c9a7d9; --red: #eb7896;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; height: 100%; overflow: hidden; -webkit-user-select: none; cursor: default; }
+  body { display: flex; flex-direction: column; justify-content: flex-end; font: 11px/1 "Maple Mono NF", "Maple Mono", ui-monospace, Menlo, monospace; color: var(--fg); }
+  .panel { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 8px 10px; box-shadow: 0 6px 24px rgba(20, 8, 16, 0.35); }
+  .row { display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0; }
+  .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .head { height: 22px; }
+  .title { color: var(--rose); font-weight: 700; }
+  .dim { color: var(--dim); }
+  .card { margin-top: 6px; border: 1px solid transparent; border-radius: 10px; background: var(--card); padding: 4px 8px; }
+  .card .top { height: 22px; }
+  .repo { font-weight: 700; }
+  .line { height: 20px; }
+  .lane { height: 20px; padding-left: 2px; }
+  .gut { color: var(--lilac); }
+  .who { color: var(--lilac); }
+  .foot { height: 18px; color: var(--dim); }
+  .compact { height: 22px; margin-top: 4px; padding: 0 4px; border-radius: 8px; border: 1px solid transparent; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--dim); }
+  .s-run .dot, .l-run .ic { background: var(--gold); color: var(--gold); }
+  .s-helpers .dot { background: var(--lilac); }
+  .s-think .dot { background: var(--blue); }
+  .s-done .dot { background: var(--green); }
+  .s-needs .dot, .s-stuck .dot { background: var(--rose); animation: pulse 1.2s ease-in-out infinite; }
+  .s-needs, .s-stuck { border-color: var(--rose); background: rgba(244, 154, 176, 0.14); }
+  .s-needs .verb, .s-stuck .verb, .s-needs .line .ic, .s-stuck .line .ic { color: var(--rose); font-weight: 700; }
+  .s-done .verb { color: var(--green); }
+  .s-closed { opacity: 0.55; }
+  .ic { width: 12px; text-align: center; flex: none; }
+  .verb { flex: none; }
+  .l-run .ic { background: none; }
+  .l-done .ic, .l-done .verb { color: var(--green); }
+  .l-fail .ic, .l-fail .verb { color: var(--red); }
+  .l-think .verb, .l-think .ic { color: var(--dim); }
+  .time { flex: none; color: var(--gold); font-variant-numeric: tabular-nums; }
+  @keyframes pulse { 50% { opacity: 0.35; } }
+</style>
+</head>
+<body>
+<div class="panel" id="panel"></div>
+<script>
+"use strict";
+const $ = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = String(text); return e; };
+const arr = v => Array.isArray(v) ? v : [];
+let data = { chats: [], more: 0, mode: "full" }, tick = null;
+
+// long paths lose their start (…/src/menu.tsx), long commands lose their end
+function fit(s, n) {
+  s = String(s || "");
+  if (s.length <= n) return s;
+  return s.includes("/") && !s.includes(" ") ? "…" + s.slice(-(n - 1)) : s.slice(0, n - 1) + "…";
+}
+function ago(since) {
+  if (!since) return "";
+  const s = Math.max(0, Math.floor(Date.now() / 1000 - since));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+function timed(since, show) { const t = $("span", "time", show ? ago(since) : ""); if (show && since) t.dataset.since = since; return t; }
+
+function step(cls, icon, verb, target, n) {
+  const r = $("div", "row " + cls);
+  r.append($("span", "ic", icon), $("span", "verb", verb), $("span", "grow dim", fit(target, n)));
+  return r;
+}
+
+function render(d) {
+  data = d || data;
+  const p = document.getElementById("panel");
+  p.replaceChildren();
+  const chats = arr(data.chats);
+  const head = $("div", "row head");
+  head.append($("span", "title", "✿ claude live"), $("span", "grow"), $("span", "dim", data.more > 0 ? "+" + data.more + " more" : ""));
+  p.append(head);
+  let running = false;
+  for (const c of chats) {
+    const live = c.status === "run" || c.status === "helpers" || c.status === "think";
+    running = running || live || arr(c.lanes).some(l => l.state === "run");
+    if (data.mode === "compact") {
+      const r = $("div", "row compact s-" + c.status);
+      r.append($("span", "dot"), $("span", "repo", fit(c.repo, 14)), $("span", "verb", c.verb), $("span", "grow dim", fit(c.target, 22)), timed(c.since, live));
+      p.append(r);
+      continue;
+    }
+    const card = $("div", "card s-" + c.status);
+    const top = $("div", "row top");
+    top.append($("span", "dot"), $("span", "repo grow", c.repo), timed(c.since, live));
+    card.append(top);
+    const main = step("line", c.icon, c.verb, c.target, 30);
+    card.append(main);
+    for (const l of arr(c.lanes)) {
+      const r = $("div", "row lane l-" + l.state);
+      r.append($("span", "gut", "┆"), $("span", "who", fit(l.type, 12)), $("span", "ic", l.icon), $("span", "verb", l.verb),
+               $("span", "grow dim", fit(l.target, 22)), timed(l.since, l.state === "run"));
+      card.append(r);
+    }
+    const bits = [];
+    if (c.folded > 0) bits.push("✓ " + c.folded + (c.folded === 1 ? " helper done" : " helpers done"));
+    if (c.more > 0) bits.push("+" + c.more + " more helpers");
+    if (c.fails > 0 && c.status !== "done") bits.push(c.fails + " failed");
+    if (bits.length) card.append($("div", "row foot", bits.join(" · ")));
+    p.append(card);
+  }
+  // the clock ticks only while something is actually running
+  if (running && !tick) tick = setInterval(() => document.querySelectorAll(".time[data-since]").forEach(t => { t.textContent = ago(Number(t.dataset.since)); }), 1000);
+  if (!running && tick) { clearInterval(tick); tick = null; }
+}
+render();
+</script>
+</body>
+</html>

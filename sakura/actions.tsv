@@ -1,0 +1,35 @@
+work	Claude + code pane side by side	Opens Claude on the left and the code pane on the right, in one Ghostty window, like an editor.	run	repo	^work$
+work 	jump into a project	Type a project name after it, like: work myapp. Opens Claude + live view there.	insert	home	^work .
+ccq	quick Claude (Haiku)	Fast and light on your limits. Best for small edits and questions.	run	any	^ccq
+cl	start Claude	Claude with your default model.	run	repo	^cl( |$)
+/handoff	in Claude: save + fresh start	Saves progress to a note, then /clear. The next chat picks it up by itself.	claude	repo	-
+shift+tab	in Claude: plan mode	Claude proposes a plan and only edits after you approve.	claude	repo	-
+replay	demo the code pane	Plays a pretend Claude chat with helper agents so you can watch the code pane fill up.	run	any	^replay
+live	code pane	The file Claude is reading or editing, new lines green, removed red, plus helpers, files and websites. Best in a split next to Claude (work opens it for you).	run	repo	^live$
+t	in the code pane: context users	Shows which steps used the most of Claude's context. Appears by itself past 40%.	key	repo	-
+hub	one chat that sees all chats	A Claude chat that can see every other chat and terminal. Ask it: what needs me? what did the bakery chat change?	run	any	^hub
+tokens	where tokens went today	Each chat's tokens, how big its context got, and the heaviest steps. tokens week for the last 7 days.	run	any	^tokens
+live --timeline	every step Claude took	Every read, edit and command as a timeline.	run	repo	^live --timeline
+ask 	one quick answer	Type a question after it. Haiku answers once, no session to manage.	insert	any	^ask 
+what 	explain a command first	Type or paste a command after it. You get what it does, what it changes, and a risk rating.	insert	any	^what
+cco	Claude for hard problems	Opus: architecture, tricky bugs, big refactors. Uses more of your limit.	run	repo	^cco
+ccr	resume your last chat	Continues the most recent Claude conversation in this folder.	run	repo	^ccr
+esc esc	in Claude: undo Claude's edits	Rewinds the chat and files to an earlier point.	claude	repo	-
+/context	in Claude: what fills the context	Shows what is using up the context window.	claude	repo	-
+todo add 	add a todo	Type the task after it. It shows as next in every new window.	insert	any	^todo add
+cmd+d	split the window	Two panes side by side. cmd+shift+d splits downward.	key	any	-
+ctrl+r	search your history	Start typing any word from a past command.	key	any	-
+todo	see your todos	Lists your todos with numbers.	run	any	^todo$
+todo done 	tick a todo off	Type its number after it.	insert	any	^todo done
+cmd+t	new tab	Opens a new tab with a fresh greeting.	key	any	-
+cmd+shift+p	every Ghostty action	Searchable list of everything Ghostty can do.	key	any	-
+cmd+shift+↑	jump to earlier commands	Scrolls straight to your previous prompt, even through long output.	key	any	-
+live --last	last chat summary	What Claude did in your most recent chat, then exits.	run	any	^live --last
+claude agents	all your Claude chats at once	Built into Claude Code: every running chat, which ones need you, and which are done.	run	any	^claude agents
+checkup	security check	FileVault, firewall, Claude sandbox, .env protection, pending updates.	run	any	^checkup
+update	patch Ghostty + tools	Updates Ghostty and this setup. update all patches everything else.	run	any	^update
+z 	jump to a folder	Type part of a folder name you have visited, like: z myapp.	insert	any	^z 
+settings	switches and toggles	Greeting, animation, card, tips, pet, font size, transparency.	run	any	^settings
+pet test	see every pet mood	The flower pet plays all five moods in the corner.	run	any	^pet
+hello	greeting again	Shows the blossom and your day at a glance.	run	any	^hello
+cmd+`	drop down terminal	Opens Ghostty from the top of the screen, from any app.	key	any	-

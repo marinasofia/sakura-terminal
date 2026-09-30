@@ -1,0 +1,31 @@
+cmd+/ opens a searchable menu of everything, pick one and it runs
+start small tasks with ccq: Haiku is faster and saves your session limit
+when the status line turns gold, /handoff then /clear for a fresh, cheap chat
+shift+tab puts Claude in plan mode: it proposes before touching any file
+esc esc rewinds Claude to an earlier point if an edit went wrong
+/context shows exactly what is filling your context window
+ask "..." gets a one line answer without opening a whole session
+cmd+d splits the window: Claude on the left, your shell on the right
+cmd+shift+enter zooms one split to full size, press again to go back
+drag files into the terminal to paste their path
+cmd+alt+l shows a small floating panel instead, press again for compact or off
+type settings to switch things on or off without editing files
+/model switches models mid chat, /effort changes how hard it thinks
+todo add something, and it shows up as next in every new window
+what <command> explains any command and rates how risky it is
+green command means it exists, rose means a typo, press → to accept grey suggestions
+cmd+shift+up jumps back to your previous command, even through long output
+ctrl+r searches everything you ever typed, just start typing a word
+start a command with a space and it won't be saved in history
+a ✗ after a command shows its error code, type what to have it explained
+run update once a week to keep Ghostty and your tools patched, update all for everything
+work opens Claude on the left and a code pane on the right: Claude's edits in green and red, inside Ghostty
+live --last shows what Claude did in your most recent chat
+in the code pane, t shows which steps filled up the context, and helpers show as a live tree
+click the flower and ask it anything big picture: what needs me, what first, am I spread too thin
+hub opens one Claude chat that sees all the others: ask it what needs you
+tokens shows where today's tokens went, and which chats grew too big
+the status line predicts when your session limit runs out, switch to ccq if it says soon
+the card under the greeting drops things once you've used them a few times
+claude agents shows every Claude chat you have running and which ones need you
+when live says looks stuck, press esc in Claude and tell it what to try instead

@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- ✿ the flower's speech bubble. Local only: no network. Answers are drawn with textContent, never as HTML. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<style>
+  :root { --bg: #2a1a26; --card: #3d2837; --line: #5a3a4f; --fg: #f3dde4; --dim: #9a7d8c; --rose: #f49ab0; --gold: #dfb06a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; overflow: hidden; }
+  body { font: 13px/1.45 "Maple Mono NF", "Maple Mono", ui-monospace, Menlo, monospace; color: var(--fg); padding: 6px 6px 16px; }
+  .bubble { position: relative; background: var(--bg); border: 1.5px solid var(--rose); border-radius: 16px; padding: 12px 14px 10px;
+            box-shadow: 0 8px 28px rgba(20, 8, 16, 0.45); }
+  .bubble::after { content: ""; position: absolute; right: 38px; bottom: -11px; width: 18px; height: 18px; background: var(--bg);
+                   border-right: 1.5px solid var(--rose); border-bottom: 1.5px solid var(--rose); transform: rotate(45deg); }
+  .head { display: flex; align-items: center; gap: 6px; color: var(--rose); font-weight: 700; margin-bottom: 8px; }
+  .head .hint { margin-left: auto; color: var(--dim); font-weight: 400; font-size: 11px; }
+  .log { max-height: 300px; overflow-y: auto; margin-bottom: 8px; }
+  .log:empty { display: none; }
+  .q { color: var(--rose); margin-top: 8px; }
+  .q:first-child { margin-top: 0; }
+  .a { white-space: pre-wrap; margin-top: 3px; }
+  .a.wait { color: var(--dim); }
+  .a.wait::after { content: "…"; animation: dots 1.2s steps(4) infinite; display: inline-block; width: 1.2em; overflow: hidden; vertical-align: bottom; }
+  @keyframes dots { from { width: 0 } to { width: 1.2em } }
+  textarea { width: 100%; resize: none; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--fg);
+             font: inherit; padding: 7px 10px; outline: none; min-height: 34px; max-height: 110px; }
+  textarea:focus { border-color: var(--rose); }
+  textarea::placeholder { color: var(--dim); }
+  .log::-webkit-scrollbar { width: 6px; } .log::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="bubble" id="bubble">
+  <div class="head">✿ ask me <span class="hint">enter to ask · esc to close</span></div>
+  <div class="log" id="log"></div>
+  <textarea id="q" rows="1" placeholder="what should I work on next?" autofocus></textarea>
+</div>
+<script>
+"use strict";
+const $ = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = String(text); return e; };
+const send = msg => { try { window.webkit.messageHandlers.sakura.postMessage(msg); } catch (e) {} };
+const log = document.getElementById("log"), q = document.getElementById("q");
+let waiting = null;
+
+function size() { send({ height: Math.ceil(document.getElementById("bubble").getBoundingClientRect().height) + 24 }); }
+function grow() { q.style.height = "auto"; q.style.height = Math.min(110, q.scrollHeight) + "px"; size(); }
+
+q.addEventListener("input", grow);
+q.addEventListener("keydown", e => {
+  if (e.key === "Escape") { send({ close: true }); return; }
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    const text = q.value.trim();
+    if (!text || waiting) return;
+    log.append($("div", "q", "✿ " + text));
+    waiting = $("div", "a wait", "thinking");
+    log.append(waiting); log.scrollTop = log.scrollHeight;
+    q.value = ""; grow();
+    send({ ask: text });
+  }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") send({ close: true }); });
+
+// called by the flower when the answer arrives
+function answer(text) {
+  if (!waiting) return;
+  waiting.className = "a"; waiting.textContent = String(text || "");
+  waiting = null; log.scrollTop = log.scrollHeight; size(); q.focus();
+}
+// called while the answer is still being written, with everything so far
+function stream(text) {
+  if (!waiting) return;
+  waiting.className = "a"; waiting.textContent = String(text || "");
+  log.scrollTop = log.scrollHeight; size();
+}
+function focusBox() { q.focus(); }
+size();
+</script>
+</body>
+</html>

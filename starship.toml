@@ -1,0 +1,44 @@
+"$schema" = "https://starship.rs/config-schema.json"
+add_newline = true
+format = "$directory$git_branch$git_status$python$nodejs$cmd_duration$status$line_break$character"
+
+[directory]
+format = "[](fg:bright-red)[ ♡ $path ]($style)[](fg:bright-red) "
+style = "bg:bright-red fg:black bold"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+format = "[](fg:green)[  $branch ]($style)[](fg:green) "
+style = "bg:green fg:black bold"
+
+[git_status]
+format = "([](fg:yellow)[ $all_status$ahead_behind ]($style)[](fg:yellow) )"
+style = "bg:yellow fg:black bold"
+
+[python]
+format = "([](fg:purple)[ py ${version}( \\($virtualenv\\)) ]($style)[](fg:purple) )"
+style = "bg:purple fg:black bold"
+version_format = "${major}.${minor}"
+detect_extensions = []
+detect_files = ["pyproject.toml", "requirements.txt", "setup.py", "Pipfile", ".python-version"]
+
+[nodejs]
+format = "([](fg:blue)[ node ${version} ]($style)[](fg:blue) )"
+style = "bg:blue fg:black bold"
+version_format = "${major}"
+detect_extensions = []
+
+[cmd_duration]
+min_time = 2000
+format = "[took $duration](bright-black) "
+
+[character]
+success_symbol = "[❯](bold bright-red)"
+error_symbol = "[❯](bold red)"
+
+[status]
+disabled = false
+format = "[✗ $status]($style) "
+style = "red"
+

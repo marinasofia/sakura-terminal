@@ -1,0 +1,49 @@
+# ✿ Sakura Ghostty ✿
+# Loaded from your main Ghostty config with: config-file = sakura.ghostty
+# Anything set here wins over your main config. Delete a line to keep your own value.
+
+# look
+theme = sakura-night
+font-family = Maple Mono NF
+font-size = 14
+cursor-style = bar
+cursor-style-blink = true
+window-padding-x = 16
+window-padding-y = 12
+window-padding-balance = true
+window-width = 100
+window-height = 30
+background-opacity = 0.95
+background-blur = 20
+macos-titlebar-style = tabs
+
+# app icon: beige retro frame, pink ghost
+macos-icon = custom-style
+macos-icon-frame = beige
+macos-icon-ghost-color = #f49ab0
+macos-icon-screen-color = #2a1a26,#3d2837
+
+# security
+clipboard-paste-protection = true
+clipboard-paste-bracketed-safe = true
+clipboard-read = ask
+clipboard-write = ask
+title-report = false
+auto-update = download
+
+# comfort
+window-save-state = always
+mouse-hide-while-typing = true
+confirm-close-surface = false
+
+# drop down terminal from anywhere: cmd + ` (macOS asks to allow Ghostty under Accessibility)
+keybind = global:cmd+backquote=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-animation-duration = 0.15
+
+# menu of everything: cmd + /
+keybind = cmd+slash=text:\x1bm
+
+# splits: Claude on the left, shell on the right
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down

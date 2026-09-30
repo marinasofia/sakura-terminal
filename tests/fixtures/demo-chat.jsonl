@@ -1,0 +1,40 @@
+{"ts": 0, "k": "session", "sid": "demo", "cwd": "/Users/demo/code/bakery-app"}
+{"ts": 1, "k": "prompt", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "prompt": "add a menu page and make sure the tests pass"}
+{"ts": 2, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t1", "tool": "Read", "target": "notes/ideas.md"}
+{"ts": 2, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t1", "tool": "Read", "target": "notes/ideas.md"}
+{"ts": 3, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t2", "tool": "Read", "target": "src/App.tsx"}
+{"ts": 4, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t2", "tool": "Read", "target": "src/App.tsx"}
+{"ts": 5, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t3", "tool": "Agent", "target": "find where the menu data lives", "agent": "Explore"}
+{"ts": 5, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t4", "tool": "Agent", "target": "find the theme colors", "agent": "Explore"}
+{"ts": 6, "k": "sub_start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "A", "atype": "Explore"}
+{"ts": 6, "k": "sub_start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "B", "atype": "Explore"}
+{"ts": 6, "k": "sub_start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "A", "atype": "Explore"}
+{"ts": 7, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "a1", "tool": "Grep", "target": "menu", "aid": "A"}
+{"ts": 8, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "a1", "tool": "Grep", "target": "menu", "aid": "A"}
+{"ts": 8, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "b1", "tool": "Read", "target": "src/styles/theme.css", "aid": "B"}
+{"ts": 9, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "b1", "tool": "Read", "target": "src/styles/theme.css", "aid": "B"}
+{"ts": 9, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "a2", "tool": "Read", "target": "src/data/menu.json", "aid": "A"}
+{"ts": 10, "k": "sub_stop", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "Z"}
+{"ts": 11, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "a2", "tool": "Read", "target": "src/data/menu.json", "aid": "A"}
+{"ts": 12, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "b2", "tool": "Glob", "target": "src/**/*.css", "aid": "B"}
+{"ts": 13, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "b2", "tool": "Glob", "target": "src/**/*.css", "aid": "B"}
+{"ts": 14, "k": "sub_stop", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "B"}
+{"ts": 14, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t4", "tool": "Agent", "target": "find the theme colors", "agent": "Explore"}
+{"ts": 15, "k": "sub_stop", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "A"}
+{"ts": 15, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t3", "tool": "Agent", "target": "find where the menu data lives", "agent": "Explore"}
+{"ts": 17, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t5", "tool": "Write", "target": "src/menu.tsx"}
+{"ts": 17, "k": "notify", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "ntype": "permission_prompt"}
+{"ts": 22, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t5", "tool": "Write", "target": "src/menu.tsx", "add": 42}
+{"ts": 24, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t6", "tool": "Edit", "target": "src/App.tsx"}
+{"ts": 25, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t6", "tool": "Edit", "target": "src/App.tsx", "add": 4, "del": 1}
+{"ts": 26, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t7", "tool": "Agent", "target": "run the tests", "agent": "tester"}
+{"ts": 27, "k": "sub_start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "C", "atype": "tester"}
+{"ts": 28, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "c1", "tool": "Bash", "target": "npm test", "aid": "C"}
+{"ts": 32, "k": "fail", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "c1", "tool": "Bash", "target": "npm test", "aid": "C", "err": "Exit code 1"}
+{"ts": 33, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "c2", "tool": "Edit", "target": "src/menu.test.tsx", "aid": "C"}
+{"ts": 34, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "c2", "tool": "Edit", "target": "src/menu.test.tsx", "aid": "C", "add": 6, "del": 2}
+{"ts": 35, "k": "start", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "c3", "tool": "Bash", "target": "npm test", "aid": "C"}
+{"ts": 40, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "c3", "tool": "Bash", "target": "npm test", "aid": "C"}
+{"ts": 41, "k": "sub_stop", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "aid": "C"}
+{"ts": 41, "k": "ok", "sid": "demo", "cwd": "/Users/demo/code/bakery-app", "id": "t7", "tool": "Agent", "target": "run the tests", "agent": "tester"}
+{"ts": 43, "k": "stop", "sid": "demo", "cwd": "/Users/demo/code/bakery-app"}

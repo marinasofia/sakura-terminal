@@ -33,6 +33,12 @@ try:
     check("guard steers Claude away from node_modules", code == 2 and "installed or generated" in err, err)
     check("guard allows it when Claude asks again", hook("guard.sh", {**read(dep), "cwd": os.path.join(home, "app")})[0] == 0)
     check("guard ignores a junk-looking folder above the project", hook("guard.sh", {**read(small), "cwd": home})[0] == 0)
+    locked = os.path.join(home, "locked.py")
+    with open(locked, "w") as f: f.write("x = 1\n")
+    os.chmod(locked, 0)
+    code, _, err = hook("guard.sh", read(locked))
+    check("guard steps aside for a file it can't read", code == 0 and "KB" not in err, err)
+    os.chmod(locked, 0o600)
 
     os.makedirs(os.path.join(home, ".cache/sakura/ctx"), exist_ok=True)
     with open(os.path.join(home, ".cache/sakura/ctx/s1"), "w") as f: f.write("45.2")

@@ -12,7 +12,8 @@ case "/${path#"$cwd"/}" in */node_modules/*|*/.venv/*|*/venv/*|*/dist/*|*/build/
 if [ -z "$junk" ]; then
   jq -e '.tool_input.offset != null or .tool_input.limit != null' <<<"$input" >/dev/null && exit 0   # already reading a part
   case "$(printf %s "$path" | tr "[:upper:]" "[:lower:]")" in *.png|*.jpg|*.jpeg|*.gif|*.webp|*.heic|*.pdf|*.ipynb) exit 0 ;; esac          # images, pdfs, notebooks read differently
-  size=$(wc -c < "$path" | tr -d ' ')
+  size=$(wc -c < "$path" 2>/dev/null | tr -d ' ')
+  [[ $size =~ ^[0-9]+$ ]] || exit 0                  # can't measure it (no permission): let Claude's own Read report that
   limit=${SAKURA_READ_LIMIT:-80000}                  # ~20k tokens
   [ "$size" -le "$limit" ] && exit 0
 fi

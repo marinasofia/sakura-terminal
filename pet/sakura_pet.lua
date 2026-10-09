@@ -54,7 +54,8 @@ local function chat()
     cwd = jstr(line, "cwd") or cwd
   end
   local ai, custom = "", nil
-  if tp and tp:match("%.jsonl$") then
+  local projects = os.getenv("HOME") .. "/.claude/projects/"
+  if tp and tp:match("%.jsonl$") and tp:sub(1, #projects) == projects and not tp:find("..", 1, true) then
     pcall(function()
       for line in io.lines(tp) do
         if line:find('"ai-title"', 1, true) then ai = jstr(line, "aiTitle") or ai end
@@ -94,9 +95,10 @@ end run
 local function goToChat()
   local ok, title, cwd = pcall(chat)
   if not ok then title, cwd = "", "" end
-  -- the title and folder go to osascript as arguments, never pasted into the script
+  -- the title and folder go to osascript as arguments, never pasted into the script, and after "--"
+  -- so a title starting with "-e" (titles are written by a model) can't be read as more script
   local t = hs.task.new("/usr/bin/osascript", function(code) if code ~= 0 then hs.application.launchOrFocus("Ghostty") end end,
-    { "-e", FOCUS, title, cwd })
+    { "-e", FOCUS, "--", title, cwd })
   if not (t and t:start()) then hs.application.launchOrFocus("Ghostty") end
 end
 

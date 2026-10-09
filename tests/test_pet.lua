@@ -74,19 +74,29 @@ print("✿ pet click")
 local live = F.HOMEDIR .. "/.cache/sakura/live/"
 os.execute("mkdir -p '" .. live .. "'")
 local function put(p, s) local h = assert(io.open(p, "w")); h:write(s); h:close() end
-local tp = F.HOMEDIR .. "/chat.jsonl"
-put(tp, '{"type":"user"}\n{"type":"ai-title","aiTitle":"Old name"}\n{"type":"ai-title","aiTitle":"Draggable \\"pet\\" widget"}\n')
-put(live .. "abc-123.jsonl", '{"k":"session","sid":"abc-123","cwd":"/Users/me/proj","tp":"' .. tp .. '"}\n{"k":"ok","sid":"abc-123","cwd":"/Users/me/proj"}\n')
-put(live .. ".pet-sid", "abc-123")
-mouseFn(canvas, "mouseDown", "pet", 10, 10); tapFn(ev(T.leftMouseUp)); mouseFn(canvas, "mouseUp", "pet", 10, 10)
-local task = F.tasks[#F.tasks]
+local projects = F.HOMEDIR .. "/.claude/projects/proj/"
+os.execute("mkdir -p '" .. projects .. "'")
+local function chatAt(tp, titles)
+  put(tp, '{"type":"user"}\n' .. titles)
+  put(live .. "abc-123.jsonl", '{"k":"session","sid":"abc-123","cwd":"/Users/me/proj","tp":"' .. tp .. '"}\n{"k":"ok","sid":"abc-123","cwd":"/Users/me/proj"}\n')
+  put(live .. ".pet-sid", "abc-123")
+end
+local function click() mouseFn(canvas, "mouseDown", "pet", 10, 10); tapFn(ev(T.leftMouseUp)); mouseFn(canvas, "mouseUp", "pet", 10, 10); return F.tasks[#F.tasks] end
+chatAt(projects .. "chat.jsonl", '{"type":"ai-title","aiTitle":"Old name"}\n{"type":"ai-title","aiTitle":"Draggable \\"pet\\" widget"}\n')
+local task = click()
 check("a click asks Ghostty for the chat's tab", task and task.path == "/usr/bin/osascript", task and task.path)
-check("by its latest title", task and task.args[3] == 'Draggable "pet" widget', task and task.args[3])
-check("with its folder as a fallback", task and task.args[4] == "/Users/me/proj", task and task.args[4])
+check("options end before the title and folder", task and task.args[3] == "--", task and task.args[3])
+check("by its latest title", task and task.args[4] == 'Draggable "pet" widget', task and task.args[4])
+check("with its folder as a fallback", task and task.args[5] == "/Users/me/proj", task and task.args[5])
+chatAt(projects .. "chat.jsonl", '{"type":"ai-title","aiTitle":"-eproperty p : 1"}\n')
+task = click()
+check("a title that looks like an option stays a plain argument", task and task.args[3] == "--" and task.args[4] == "-eproperty p : 1", task and task.args[4])
+chatAt(F.HOMEDIR .. "/elsewhere.jsonl", '{"type":"ai-title","aiTitle":"Not a chat"}\n')
+task = click()
+check("only transcripts under ~/.claude/projects are read", task and task.args[4] == "", task and task.args[4])
 put(live .. ".pet-sid", "../../etc/passwd")
-mouseFn(canvas, "mouseDown", "pet", 10, 10); mouseFn(canvas, "mouseUp", "pet", 10, 10)
-task = F.tasks[#F.tasks]
-check("a bad session id is never read as a path, Ghostty still comes forward", task and task.args[3] == "" and task.args[4] == "", task and task.args[3])
+task = click()
+check("a bad session id is never read as a path, Ghostty still comes forward", task and task.args[4] == "" and task.args[5] == "", task and task.args[4])
 
 print(fails == 0 and "pet ok ✿" or (fails .. " failed"))
 os.exit(fails == 0 and 0 or 1)

@@ -1,5 +1,5 @@
 #!/bin/bash
-# ✿ rebuilds docs/helpers.png (the real code pane's helper tree) and docs/bubble.png (the real ask bubble) from a pretend bakery chat.
+# ✿ rebuilds docs/helpers.png (the real code pane's helper tree) from a pretend bakery chat.
 # Needs macOS with Xcode command line tools, Google Chrome, and the Maple Mono NF font.
 # Uses a throwaway demo home with made up data, so nothing personal ends up in the picture.
 set -euo pipefail
@@ -59,32 +59,3 @@ PY
 swiftc -O -module-cache-path "$W/mc" "$HERE/render.swift" -o "$W/render"
 "$W/render" demo "$REPO/pet" "$REPO/docs/helpers.png" "$W/frames.json"
 echo "✿ docs/helpers.png"
-
-# docs/bubble.png: the real bubble page in headless Chrome, with a pretend question and answer
-B="$W/bubble"; mkdir -p "$B"; cp "$REPO/pet/awake.png" "$B/"
-/usr/bin/python3 - "$REPO/pet/bubble.html" "$B/index.html" <<'PY'
-import sys
-html = open(sys.argv[1], encoding="utf-8").read()
-html = html.replace('<meta http-equiv="Content-Security-Policy"', '<meta name="csp-off-for-the-picture"')   # the picture needs the pet image
-html = html.replace("</style>", "  html, body { background: #fbf0f4; } body { width: 520px; height: 420px; padding: 20px 0 0 20px; }\n"
-                    "  .bubble { width: 380px; } .pet { position: absolute; left: 312px; top: 322px; width: 86px; image-rendering: pixelated; }\n</style>")
-html = html.replace("</body>", '''<img class="pet" src="awake.png">
-<script>
-const ask = t => { q.value = t; q.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" })); };
-ask("should I finish the bakery site or the blog first?");
-answer("The bakery site. Its chat is waiting on you to approve the test run, and the menu page is one step from done. The blog can wait: its draft chat finished and only needs a read through.");
-ask("and after that?");
-q.blur();
-</script>
-</body>''')
-open(sys.argv[2], "w", encoding="utf-8").write(html)
-PY
-CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-"$CHROME" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=2 --window-size=520,420 \
-  --user-data-dir="$W/chrome" --screenshot="$W/bubble.png" "file://$B/index.html" >/dev/null 2>&1 &
-chrome=$!                                   # headless Chrome can linger after the shot: wait for the file, then stop it
-for _ in $(seq 60); do [ -s "$W/bubble.png" ] && break; sleep 0.5; done
-sleep 1; kill "$chrome" 2>/dev/null || true
-[ -s "$W/bubble.png" ] || { echo "Chrome made no picture"; exit 1; }
-cp "$W/bubble.png" "$REPO/docs/bubble.png"
-echo "✿ docs/bubble.png"

@@ -80,19 +80,6 @@ try:
     check("hub shows plain terminal commands too", "npm run build [exit 1]" in out and "git status [ok]" in out, out[-300:])
     out = tool(os.path.join(REPO, "sakura/hub.py"), "bakery")
     check("hub can zoom into one chat's steps", "recent steps:" in out and "editing /code/bakery/menu.tsx" in out, out[-400:])
-    # the flower's ask: must answer even when its stdin is never closed (that is how Hammerspoon runs it)
-    fakebin = os.path.join(home, "bin"); os.makedirs(fakebin)
-    with open(os.path.join(fakebin, "claude"), "w") as f:
-        f.write('#!/bin/bash\ncat > "$HOME/ask-prompt.txt"\necho \'{"type":"stream_event","event":{"delta":{"type":"text_delta","text":"Bakery first."}}}\'\n')
-    os.chmod(os.path.join(fakebin, "claude"), 0o755)
-    p = subprocess.Popen([sys.executable, os.path.join(REPO, "sakura/ask.py"), "--stream", "--json", json.dumps({"question": "what first?", "history": [["a", "b"]]})],
-                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=dict(env, PATH=fakebin + ":/usr/bin:/bin"))
-    import threading
-    guard = threading.Timer(15, p.kill); guard.start()        # if ask ever waits on stdin again, fail instead of freezing
-    out = p.stdout.read(); guard.cancel(); p.kill()
-    check("ask answers even with stdin left open (no hang)", out.strip() == "Bakery first.", out)
-    prompt = open(os.path.join(home, "ask-prompt.txt")).read()
-    check("ask gives Claude the board, the question and the last answer", "<board>" in prompt and "Question: what first?" in prompt and "A: b" in prompt, prompt[-200:])
     # secrets never reach the activity log, the step previews or the hub (same patterns in event.sh and hub.py)
     # every value below is made up. A "~" splits each one in the source so secret scanners don't mistake the test for a leak;
     # it is taken out before the test runs

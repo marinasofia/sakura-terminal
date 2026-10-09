@@ -182,7 +182,7 @@ Exactly what is kept, where, for how long, and how to delete it: [SECURITY.md](S
 * **Shell:** `~/.config/sakura` and a marked block at the end of `~/.zshrc`
 * **Prompt:** `~/.config/starship.toml` (yours is backed up)
 * **Claude Code:** `~/.claude/sakura` (status line + hooks), a `/handoff` skill, a `tester` agent, the `sakura` reply style, and in `~/.claude/settings.json`: the hooks, the sandbox, and a read block for `.env` files (anything of yours stays)
-* **Pet:** `~/.hammerspoon/sakura_*.lua` (flower, ask bubble, live panel)
+* **Pet:** `~/.hammerspoon/sakura_*.lua` (flower, live panel)
 
 `work` opens its split with Ghostty 1.3 or newer (run `update` if yours is older). macOS may ask you to allow Hammerspoon (for the pet), Ghostty under Accessibility (for the **cmd + `** drop down terminal), and Ghostty under Automation (for `work`). All optional.
 

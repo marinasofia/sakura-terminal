@@ -43,7 +43,7 @@ cat <<EOF
                             token savers: big-file guard, skip node_modules/.venv/dist/build, context nudge,
                             and the short "sakura" reply style (switch back any time with /output-style)
 EOF
-[ "$PET" = 1 ] && echo "                            ~/.hammerspoon/sakura_*.lua (flower pet, ask bubble, live panel)"
+[ "$PET" = 1 ] && echo "                            ~/.hammerspoon/sakura_*.lua (flower pet, live panel)"
 cat <<EOF
     never touch             your CLAUDE.md, your Ghostty config values, anything outside the paths above
     undo with               ./uninstall.sh
@@ -89,7 +89,7 @@ find "$HERE/sakura" -maxdepth 1 -type f -exec cp {} "$HOME/.config/sakura/" \;
 P="$HOME/.config/sakura/prefs.zsh"
 grep -q '^SAKURA_SHELL_LOG=' "$P" || echo 'SAKURA_SHELL_LOG=0' >> "$P"          # older prefs: the terminal log stays off
 [ "$SHLOG" = 1 ] && sed -i '' 's/^SAKURA_SHELL_LOG=[0-9]*/SAKURA_SHELL_LOG=1/' "$P"
-cp "$HERE/pet/"*.png "$HERE/pet/panel.html" "$HERE/pet/bubble.html" "$HOME/.config/sakura/pet/"
+cp "$HERE/pet/"*.png "$HERE/pet/panel.html" "$HOME/.config/sakura/pet/"
 cp "$HERE/tests/fixtures/demo-chat.jsonl" "$HOME/.config/sakura/"   # for `replay`
 
 # prompt + zsh
@@ -149,8 +149,9 @@ cat "$S.tmp" > "$S" && rm -f "$S.tmp"                                  # write t
 
 # flower pet (Hammerspoon)
 if [ "$PET" = 1 ]; then
-  mkdir -p "$HOME/.hammerspoon"; cp "$HERE/pet/sakura_pet.lua" "$HERE/pet/sakura_panel.lua" "$HERE/pet/sakura_live.lua" "$HERE/pet/sakura_bubble.lua" "$HOME/.hammerspoon/"
+  mkdir -p "$HOME/.hammerspoon"; cp "$HERE/pet/sakura_pet.lua" "$HERE/pet/sakura_panel.lua" "$HERE/pet/sakura_live.lua" "$HOME/.hammerspoon/"
   rm -f "$HOME/.hammerspoon/sakura_studio.lua" "$HOME/.config/sakura/pet/studio.html"   # the studio window was retired
+  rm -f "$HOME/.hammerspoon/sakura_bubble.lua" "$HOME/.config/sakura/pet/bubble.html" "$HOME/.config/sakura/ask.py" "$HOME/.cache/sakura/bubble.log"   # and so was the ask bubble
   touch "$HOME/.hammerspoon/init.lua"
   grep -q 'require("sakura_pet")' "$HOME/.hammerspoon/init.lua" || printf '\nrequire("sakura_pet")\n' >> "$HOME/.hammerspoon/init.lua"
   if pgrep -xq Hammerspoon; then

@@ -1,5 +1,5 @@
 """✿ builds one short clip per feature for video editing (called by make.sh --clips).
-Every clip is made from the real greeting, menu, code pane and ask bubble, fed with made up data."""
+Every clip is made from the real greeting, menu and code pane, fed with made up data."""
 import json, os, re, shutil, subprocess, sys, time
 
 W, S, H, APP, REPO = sys.argv[1:6]
@@ -95,42 +95,4 @@ for k in range(2, len(answer) + 1):
     fs.append(frame(body + answer[:k], 0.7 if k < len(answer) else 4.0, pet="needs" if k == len(answer) else "working"))
 save("07-what", fs)
 
-# 8 · the ask bubble, drawn by the real bubble page in headless Chrome, on a see-through background
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-if os.path.exists(CHROME):
-    B = os.path.join(W, "bubble"); os.makedirs(B, exist_ok=True); shutil.copy(f"{REPO}/pet/awake.png", B); shutil.copy(f"{REPO}/pet/working.png", B)
-    base = open(f"{REPO}/pet/bubble.html", encoding="utf-8").read()
-    base = base.replace('<meta http-equiv="Content-Security-Policy"', '<meta name="csp-off-for-the-clip"')
-    base = base.replace("</style>", "  html, body { background: transparent !important; } body { width: 520px; height: 440px; padding: 20px 0 108px 20px; display: flex; flex-direction: column; justify-content: flex-end; }\n"
-                        "  .bubble { width: 380px; } .pet { position: absolute; left: 312px; top: 342px; width: 86px; image-rendering: pixelated; }\n"
-                        "  .a.wait::after { animation: none; width: 1.2em; }\n</style>")
-    q = "should I finish the bakery site or the blog first?"
-    a = ("The bakery site. Its chat is waiting on you to approve the test run, and the menu page is one step from done. "
-         "The blog can wait: its draft chat finished and only needs a read through.")
-    states = [("", "", "", "awake", 0.8)]
-    for i in range(6, len(q) + 6, 6): states.append((q[:i], "", "", "awake", 0.09))
-    states.append(("", q, "wait", "working", 1.4))
-    words = a.split(" ")
-    for i in range(3, len(words) + 3, 3): states.append(("", q, " ".join(words[:i]), "working", 0.14))
-    states.append(("", q, a, "awake", 4.0))
-    shots = []
-    for n, (typed, asked, said, pet, delay) in enumerate(states):
-        js = f"q.value = {json.dumps(typed)}; grow();"
-        if asked: js += f"q.value = {json.dumps(asked)}; q.dispatchEvent(new KeyboardEvent('keydown', {{ key: 'Enter' }}));"
-        if said and said != "wait": js += f"stream({json.dumps(said)});"
-        if not typed: js += "q.blur();"
-        page = base.replace("</body>", f'<img class="pet" src="{pet}.png">\n<script>{js}</script>\n</body>')
-        open(f"{B}/s{n}.html", "w", encoding="utf-8").write(page)
-        png = f"{B}/s{n}.png"
-        p = subprocess.Popen([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=2", "--window-size=520,440",
-                              "--default-background-color=00000000", f"--user-data-dir={B}/chrome", f"--screenshot={png}", f"file://{B}/s{n}.html"],
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        for _ in range(60):
-            if os.path.exists(png) and os.path.getsize(png) > 0: break
-            time.sleep(0.25)
-        time.sleep(0.3); p.kill(); p.wait()
-        shots.append([png, delay])
-    json.dump(shots, open(f"{OUT}/08-ask-bubble.images.json", "w"))
-else:
-    print("no Google Chrome: skipped the ask bubble clip")
 print(len(os.listdir(OUT)), "clips")

@@ -9,7 +9,7 @@ Everything CI runs, locally:
 ```bash
 shellcheck -S warning install.sh uninstall.sh claude/hooks/*.sh claude/statusline.sh tests/*.sh docs/make-gifs/*.sh
 for f in sakura/*.zsh zshrc-block.zsh; do zsh -n "$f"; done
-tests/run.sh                        # Lua: live state, panel, pet link, ask bubble (Hammerspoon's Lua works too)
+tests/run.sh                        # Lua: live state, panel, pet (Hammerspoon's Lua works too)
 python3 tests/test_codeview.py      # the code pane
 python3 tests/test_tools.py         # hooks, redaction, hub, tokens, ask
 bash tests/test_uninstall.sh        # uninstall removes only what install added
@@ -39,4 +39,4 @@ Read [SECURITY.md](SECURITY.md) first. In short:
 
 * Plain, friendly words in the UI and docs. No dashes as punctuation (use commas, colons or periods).
 * Comments explain why, briefly, in the same voice as the code around them.
-* Pictures in `docs/` are rebuilt from made up data: `docs/make-gifs/make.sh` (GIFs and banner) and `docs/make-gifs/stills.sh` (helper tree and ask bubble). `make.sh --clips <folder>` also writes one clip per feature for video editing (`.gif`, `.mp4`, and a see-through ProRes `.mov`). `screen-demo.sh --record <file.mov>` films a real Ghostty window playing a pretend chat beside the real code pane, in a throwaway home with made up data. Never commit screenshots of real chats.
+* Pictures in `docs/` are rebuilt from made up data: `docs/make-gifs/make.sh` (GIFs and banner) and `docs/make-gifs/stills.sh` (helper tree). `make.sh --clips <folder>` also writes one clip per feature for video editing (`.gif`, `.mp4`, and a see-through ProRes `.mov`). `screen-demo.sh --record <file.mov>` films a real Ghostty window playing a pretend chat beside the real code pane, in a throwaway home with made up data. Never commit screenshots of real chats.

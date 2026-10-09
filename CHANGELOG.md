@@ -3,7 +3,7 @@
 ## Unreleased
 
 * Dragging the flower works again
-* Clicking the flower jumps to the Ghostty tab of the chat she's showing; the ask bubble is gone
+* Clicking the flower jumps to the Ghostty tab of the chat she's showing; the ask bubble and its `ask.py` are gone
 
 ## 1.0.2 (2026-09-30)
 

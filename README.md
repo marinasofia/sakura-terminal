@@ -57,11 +57,7 @@ She floats in the corner of your screen and changes face while Claude Code works
 </tr>
 </table>
 
-**Click her and ask anything big-picture** in a little speech bubble: *"what needs me?"*, *"should I finish the bakery site or the blog first?"*, *"am I spreading myself too thin?"* She sees every Claude chat and your todos (and your terminals, if you turn that on), and answers in a few lines (dictation works too: press fn twice).
-
-<div align="center"><img src="docs/bubble.png" width="420" alt="the flower's speech bubble answering which project to do first"></div>
-
-Drag her anywhere. **Option + click** jumps back to Ghostty. **cmd + alt + p** hides her. Type `pet test` to see every mood.
+**Click her** to jump to the Ghostty tab of the chat she's showing, so a chat that needs you is one click away. Drag her anywhere. **cmd + alt + p** hides her. Type `pet test` to see every mood.
 
 <br>
 

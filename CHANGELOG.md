@@ -1,5 +1,10 @@
 # ✿ Changelog
 
+## Unreleased
+
+* Dragging the flower works again
+* Clicking the flower jumps to the Ghostty tab of the chat she's showing; the ask bubble is gone
+
 ## 1.0.2 (2026-09-30)
 
 * Your own `handoff` skill is kept on install and uninstall

@@ -95,6 +95,8 @@ case "$kind" in
   end)  pet=idle ;;
   notify) [[ $line =~ \"ntype\":\"(permission_prompt|idle_prompt|elicitation_dialog|agent_needs_input)\" ]] && pet=needs ;;
 esac
+# clicking the pet goes to this chat's tab, so remember which chat set her mood (a chat that needs you always wins)
+[ -n "$pet" ] && { [ "$pet" = needs ] || [ "$pet" = "done" ] || [ "$(cat "$dir/.pet" 2>/dev/null)" != "$pet" ]; } && printf '%s' "$sid" > "$dir/.pet-sid"
 # only tell the pet when her mood changes (no process launch on every step)
 if [ -n "$pet" ] && [ "$(cat "$dir/.pet" 2>/dev/null)" != "$pet" ]; then
   printf '%s' "$pet" > "$dir/.pet"

@@ -1,0 +1,8 @@
+# Gitleaks config: the built-in rules plus anything this repo needs.
+[extend]
+useDefault = true
+
+# Allow a known false positive by path, never by disabling a rule:
+[[allowlists]]
+description = "Made up secrets that test the masking (every value is fake, see the comment above the corpus)"
+paths = ['''^tests/test_tools\.py$''']

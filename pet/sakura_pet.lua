@@ -54,10 +54,13 @@ local function chat()
     cwd = jstr(line, "cwd") or cwd
   end
   local ai, custom = "", nil
+  -- only a transcript really inside ~/.claude/projects: no "..", and links are followed before checking
   local projects = os.getenv("HOME") .. "/.claude/projects/"
-  if tp and tp:match("%.jsonl$") and tp:sub(1, #projects) == projects and not tp:find("..", 1, true) then
+  local root = hs.fs.pathToAbsolute(projects)
+  local real = tp and tp:match("%.jsonl$") and not tp:find("..", 1, true) and tp:sub(1, #projects) == projects and hs.fs.pathToAbsolute(tp)
+  if root and real and real:sub(1, #root + 1) == root .. "/" and real:match("%.jsonl$") then
     pcall(function()
-      for line in io.lines(tp) do
+      for line in io.lines(real) do
         if line:find('"ai-title"', 1, true) then ai = jstr(line, "aiTitle") or ai end
         if line:find('"custom-title"', 1, true) then custom = jstr(line, "customTitle") or custom end
       end

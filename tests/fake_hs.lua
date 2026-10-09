@@ -65,6 +65,8 @@ hs = {
            if a then return all[a] end
            return all end,
          mkdir = function(p) os.execute("mkdir -p '" .. p .. "'") end,
+         -- like the real one: the full path with links followed (nil when the path is missing)
+         pathToAbsolute = function(p) local h = io.popen("/bin/realpath '" .. p:gsub("'", "'\\''") .. "' 2>/dev/null"); local r = h:read("l"); h:close(); return r end,
          -- like the real one: iterator plus a dir object that must be passed back in
          dir = function(p) local names = {} for n in io.popen("ls -a '" .. p .. "'"):lines() do names[#names+1] = n end
                  local obj = setmetatable({ i = 0, names = names }, { __name = "hs.fs.dir" })

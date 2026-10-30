@@ -157,6 +157,7 @@ if [ "$PET" = 1 ]; then
   if pgrep -xq Hammerspoon; then
     say "Hammerspoon is running: click its menu bar icon › Reload Config to load the pet and live panel"
   else
+    say "starting Hammerspoon (it will ask for Accessibility permission)"
     open -a Hammerspoon 2>/dev/null || true
     say "first time: macOS may ask about Hammerspoon. The pet appears bottom right"
   fi

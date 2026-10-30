@@ -21,6 +21,10 @@ Everything lives in `~/.cache/sakura`, a folder only your user can open (permiss
 
 Hammerspoon also remembers the flower's position and the panel mode in its own settings.
 
+### What is read
+
+Besides its own files, Sakura reads Claude Code's own chat logs under `~/.claude/projects`, in place and read only: each chat's title, the last reply in each chat's transcript (up to 300 characters, masked, for `hub`; one line of it in the code pane) and the token counts behind `tokens`.
+
 ### Turning things off and deleting them
 
 * Terminal log: `settings` › *log terminal commands*. Turning it off deletes `shell.log`.

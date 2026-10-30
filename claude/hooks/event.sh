@@ -48,14 +48,17 @@ printf '%s\n' "$line" >> "$dir/$sid.jsonl"
 # before Claude edits a file, keep a private copy so the code pane can show exactly what changed
 if [ "$kind" = start ] && [[ $line =~ \"tool\":\"(Edit|MultiEdit|Write|NotebookEdit)\" ]]; then
   id=$(jq -r '.tool_use_id // empty' <<<"$input"); path=$(jq -r '(.tool_input.file_path // .tool_input.notebook_path) // empty' <<<"$input")
-  base=$(basename "$path" 2>/dev/null)
+  base=$(basename "$path" 2>/dev/null); real="$(cd "$(dirname "$path")" 2>/dev/null && pwd -P)/$base"
+  # nothing from private folders either, whatever the file is called (same list as PRIVATE in sakura/codeview.py)
+  private='/\.(ssh|aws|gnupg|kube|docker)/|/\.config/gh/|/Library/Keychains/'
   if [[ $id =~ ^[A-Za-z0-9_-]+$ ]] && [ -f "$path" ] && [ ! -L "$path" ] && [ "$(wc -c < "$path")" -le 262144 ] \
-     && [ "$(cd "$(dirname "$path")" 2>/dev/null && pwd -P)/$base" = "$(dirname "$path")/$base" ] \
+     && [ "$real" = "$(dirname "$path")/$base" ] && [[ ! $path =~ $private ]] && [[ ! $real =~ $private ]] \
      && [[ ! $base =~ ^\.env|\.pem$|\.key$|^id_(rsa|ed25519|ecdsa)|credentials|secret ]]; then
     mkdir -p "$dir/before" && cp "$path" "$dir/before/$id" 2>/dev/null
   fi
   # and the edit itself, so the code pane can show it the moment Claude decides it (before it is saved)
-  if [[ $id =~ ^[A-Za-z0-9_-]+$ ]] && [[ ! $base =~ ^\.env|\.pem$|\.key$|^id_(rsa|ed25519|ecdsa)|credentials|secret ]]; then
+  if [[ $id =~ ^[A-Za-z0-9_-]+$ ]] && [[ ! $path =~ $private ]] && [[ ! $real =~ $private ]] \
+     && [[ ! $base =~ ^\.env|\.pem$|\.key$|^id_(rsa|ed25519|ecdsa)|credentials|secret ]]; then
     edit=$(jq -c '(.tool_input // {}) | {old: .old_string, new: .new_string, all: .replace_all, content: .content,
       edits: (if .edits then [.edits[] | {old: .old_string, new: .new_string, all: .replace_all}] else null end)}
       | with_entries(select(.value != null))' <<<"$input" 2>/dev/null)

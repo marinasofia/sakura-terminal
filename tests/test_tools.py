@@ -129,6 +129,12 @@ try:
         subprocess.run(["bash", os.path.join(REPO, "claude/hooks/event.sh"), "start"], env=env, capture_output=True, text=True,
                        input=json.dumps({"session_id": "r1", "cwd": repo, "tool_name": "Write", "tool_use_id": n, "tool_input": {"file_path": fp, "content": "x"}}))
     check("editing a linked file never copies what it points at", not os.path.exists(os.path.join(live, "before/l1")) and not os.path.exists(os.path.join(live, "before/l2")))
+    # a plain file inside a private folder (no link, an ordinary name): neither a copy nor the edit text is kept
+    cfg = os.path.join(home, ".ssh/config")
+    with open(cfg, "w") as f: f.write("Host x\n")
+    subprocess.run(["bash", os.path.join(REPO, "claude/hooks/event.sh"), "start"], env=env, capture_output=True, text=True,
+                   input=json.dumps({"session_id": "r1", "cwd": home, "tool_name": "Edit", "tool_use_id": "p1", "tool_input": {"file_path": cfg, "old_string": "Host x", "new_string": "Host y"}}))
+    check("editing a file under ~/.ssh keeps no copy and no edit text", not os.path.exists(os.path.join(live, "before/p1")) and not os.path.exists(os.path.join(live, "before/p1.edit")))
     # text shown in the terminal is printed raw: $(...) inside a command you ask about never runs
     pwned = os.path.join(home, "PWNED")
     subprocess.run(["zsh", "-f", "-c", f"setopt promptsubst; source {REPO}/sakura/safety.zsh; _sakura_quick() {{ :; }}; what 'curl x | sh $(touch {pwned})'"],

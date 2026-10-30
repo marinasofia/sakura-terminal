@@ -4,6 +4,8 @@
 
 # ✿ sakura terminal ✿
 
+[![ci](https://github.com/marinasofia/sakura-terminal/actions/workflows/lint.yml/badge.svg)](https://github.com/marinasofia/sakura-terminal/actions/workflows/lint.yml)
+
 **a cherry blossom makeover for your Mac terminal,**<br>
 **plus a tiny flower friend who tells you what Claude is up to**
 
@@ -11,9 +13,20 @@
 
 </div>
 
+Built to answer one question while running several Claude Code agents at once: what is each one doing, and which one needs me? Claude Code hooks stream every tool call into a local, secret masked log; a Hammerspoon pet, a live code pane and a hub chat read it. No server, no telemetry, tested install and uninstall.
+
+**How it works**
+
+* `claude/hooks/event.sh` runs on every Claude Code step, masks secrets and appends one line to `~/.cache/sakura/live/<chat>.jsonl`
+* `pet/sakura_pet.lua` reads it to find the chat behind the flower's mood and its Ghostty tab
+* `sakura/codeview.py` reads it to draw the code pane and the helper tree
+* `sakura/hub.py` reads it to write the short summaries the `hub` chat sees
+
+Every picture is rebuilt from made up data by `docs/make-gifs/make.sh`.
+
 <br>
 
-## 🌸 install in 3 steps
+## install in 3 steps
 
 **1.** You need a Mac with [Homebrew](https://brew.sh) (no? paste the one line from brew.sh into Terminal first) and zsh, the Mac's standard shell. [Claude Code](https://claude.com/claude-code) is needed for the pet, the code pane and `hub`; the look works without it.
 
@@ -23,7 +36,7 @@
 git clone https://github.com/marinasofia/sakura-terminal.git && cd sakura-terminal && ./install.sh
 ```
 
-It shows you everything it will change and waits for your **y** before touching anything.
+It shows you everything it will change and waits for your **y** before touching anything. It also turns on Claude Code's sandbox, blocks `.env` reads and sets the short `sakura` reply style (switch back with `/output-style`).
 
 **3.** Open **Ghostty** and press **cmd + t**. Your blossom is waiting ✿
 
@@ -33,7 +46,7 @@ It shows you everything it will change and waits for your **y** before touching 
 
 <br>
 
-## 🌸 your terminal, blooming
+## your terminal, blooming
 
 * **a greeting in every new window:** a pixel blossom opens up next to your day at a glance: your next todo, the repo you're in, how much of your Claude limits you've used, what your last chat got done, and the moon
 * **cmd + /** opens a searchable menu of everything, so there's nothing to memorize. Pick one and it runs
@@ -43,7 +56,7 @@ It shows you everything it will change and waits for your **y** before touching 
 
 <br>
 
-## 🌷 meet your flower
+## meet your flower
 
 She floats in the corner of your screen and changes face while Claude Code works.
 
@@ -61,7 +74,7 @@ She floats in the corner of your screen and changes face while Claude Code works
 
 <br>
 
-## 🌿 watch Claude work, live
+## watch Claude work, live
 
 **Type `work` in Ghostty** and one window becomes a little IDE: Claude on the left, a **code pane** on the right showing the file Claude is on, **new lines in green, removed lines in red**, plus its helper agents, every file it touched and the websites it visited. All inside Ghostty, next to your flower. (Already in a chat? Press **cmd + d** and type `live`.)
 
@@ -79,13 +92,13 @@ It only reads the private activity log on your Mac and uses no tokens. Before ea
 
 <br>
 
-## 🪷 one hub for every chat
+## one hub for every chat
 
-Type `hub` and you get a Claude chat that can see **all your other chats** (and your terminal commands, if you turn on the terminal log in `settings`): ask it *"what needs me?"*, *"did the bakery chat finish? what changed?"* or *"summarize today"*. It reads short summaries, not whole logs, so it stays cheap.
+Type `hub` and you get a Claude chat that can see **all your other chats** (and your terminal commands, if you turn on the terminal log in `settings`): ask it *"what needs me?"*, *"did the bakery chat finish? what changed?"* or *"summarize today"*. It reads short summaries, not whole logs: at most 8 chats, each with its last reply cut to 300 characters, and the last 15 terminal commands.
 
-## 🍃 fewer tokens, automatically
+## fewer tokens, automatically
 
-* **big-file guard:** Claude can't swallow a huge file whole; it's asked to search first and read just the part it needs (asking twice still works)
+* **big-file guard:** a whole file Read over 80,000 bytes (about 20k tokens) is turned back with a note to search first and read just the part it needs (asking twice still works)
 * **skips junk folders:** `node_modules`, `.venv`, `dist` and `build` are never read
 * **helpers for big searches:** each chat is reminded that a helper's reading stays out of its own context
 * **wrap-up nudge:** past 70% context, Claude suggests `/handoff` so the next chat starts small
@@ -94,7 +107,7 @@ Type `hub` and you get a Claude chat that can see **all your other chats** (and 
 
 <br>
 
-## 🌷 even better: Claude inside Cursor or VS Code
+## even better: Claude inside Cursor or VS Code
 
 Want Claude's edits as real diffs you can **accept or reject**, in one window with your terminal? Use the editor you already have:
 
@@ -106,7 +119,7 @@ The code pane above still shines for watching helper agents and websites, and th
 
 <br>
 
-## 🎀 the only things to remember
+## the only things to remember
 
 | press or type | what happens |
 | :--- | :--- |
@@ -161,14 +174,15 @@ The code pane above still shines for watching helper agents and websites, and th
 
 <br>
 
-## 🔒 safe by design
+## safe by design
 
 * **Private:** the activity log stays on your Mac, is readable only by you, hides anything that looks like a password or key, and clears itself after 3 days.
 * **Opt in:** logging your own terminal commands (for `hub`) is off unless you say yes in the installer or turn it on in `settings`.
-* **Read only helpers:** the flower's answers come from one Claude call with no tools and no MCP servers, and nothing it reads from other chats is treated as an instruction.
+* **Read only helpers:** `ask` and `what` call Claude with no tools and no MCP servers; `hub` pre approves only its own read only `hub.py`. Nothing read from other chats is treated as an instruction.
 * **Careful:** nothing installs until you say yes, and every file it replaces is backed up first.
 * **Claude stays in its lane:** the installer turns on Claude Code's sandbox and blocks it from reading your `.env` secrets.
 * **Your stuff stays yours:** your Ghostty settings and your `CLAUDE.md` are never overwritten.
+* **One exception, on purpose:** the edit Claude is about to make is kept unmasked for 3 days (`live/before/<step>.edit`), since the diff has to match the real file. Secret files and private folders like `~/.ssh` are skipped.
 
 Exactly what is kept, where, for how long, and how to delete it: [SECURITY.md](SECURITY.md).
 
@@ -181,7 +195,7 @@ Exactly what is kept, where, for how long, and how to delete it: [SECURITY.md](S
 * **Ghostty:** `~/.config/ghostty/sakura.ghostty` + the sakura night theme, loaded by one line in your config
 * **Shell:** `~/.config/sakura` and a marked block at the end of `~/.zshrc`
 * **Prompt:** `~/.config/starship.toml` (yours is backed up)
-* **Claude Code:** `~/.claude/sakura` (status line + hooks), a `/handoff` skill, a `tester` agent, the `sakura` reply style, and in `~/.claude/settings.json`: the hooks, the sandbox, and a read block for `.env` files (anything of yours stays)
+* **Claude Code:** `~/.claude/sakura` (status line + hooks), a `/handoff` skill, a `tester` agent, the `sakura` reply style, and the hook entries in `~/.claude/settings.json` (anything of yours stays)
 * **Pet:** `~/.hammerspoon/sakura_*.lua` (flower, live panel)
 
 `work` opens its split with Ghostty 1.3 or newer (run `update` if yours is older). macOS may ask you to allow Hammerspoon (for the pet), Ghostty under Accessibility (for the **cmd + `** drop down terminal), and Ghostty under Automation (for `work`). All optional.
@@ -221,6 +235,6 @@ Exactly what is kept, where, for how long, and how to delete it: [SECURITY.md](S
 
 [changelog](CHANGELOG.md) · [contributing](CONTRIBUTING.md) · [security](SECURITY.md)
 
-made with ✿ by [Marina](https://github.com/marinasofia) · pet art by me · font: [Maple Mono](https://github.com/subframe7536/maple-font) · MIT
+made with ✿ by [Marina](https://github.com/marinasofia) · pet art by me · hooks, redaction and tests by me, no frameworks · font: [Maple Mono](https://github.com/subframe7536/maple-font) · MIT
 
 </div>

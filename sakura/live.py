@@ -2,6 +2,7 @@
 """✿ claude live: what Claude is doing, as it happens. Uses no tokens: it only reads the hook log.
 `live` shows the code pane (the file Claude is on, with changes). `live --timeline` shows every step instead.
 `live --last` prints one snapshot and exits. Ctrl+C to close. Redraws only when something changes."""
+from __future__ import annotations
 import json, os, re, shutil, subprocess, sys, time
 
 HOME = os.path.expanduser("~")
@@ -40,8 +41,13 @@ def clip(s, w):
     out, n, i = "", 0, 0
     while i < len(s) and n < w - 1:
         if s[i] == "\x1b":
-            j = s.index("m", i) + 1; out += s[i:j]; i = j
-        else: out += s[i]; n += 1; i += 1
+            j = s.index("m", i) + 1
+            out += s[i:j]
+            i = j
+        else:
+            out += s[i]
+            n += 1
+            i += 1
     return out + "…" + R
 
 def fit(text, w): return text if len(text) <= w else text[:max(1, w - 1)] + "…"
@@ -98,8 +104,10 @@ def build(events):
     agents = {}          # agent id -> {type, t0, t1, state, kids: [call ids], call: Agent call id}
     st = {"cwd": None, "prompt": None, "turn": None, "last": None, "mode": None, "fails": 0}
     for e in events:
-        k = e.get("k"); aid = e.get("aid")
-        st["cwd"] = e.get("cwd") or st["cwd"]; st["mode"] = e.get("mode") or st["mode"]
+        k = e.get("k")
+        aid = e.get("aid")
+        st["cwd"] = e.get("cwd") or st["cwd"]
+        st["mode"] = e.get("mode") or st["mode"]
         if k == "session": calls.clear(); order.clear(); files.clear(); agents.clear(); st.update(fails=0, prompt=None, turn=None)
         if k == "prompt":
             st["turn"] = e["ts"]
@@ -122,7 +130,9 @@ def build(events):
             if k == "ok":
                 cl.update(state="ok", t1=e["ts"], add=e.get("add"), dele=e.get("del"))
                 if e.get("add") is not None and cl["target"]:
-                    f = files.setdefault(cl["target"], [0, 0]); f[0] += e.get("add") or 0; f[1] += e.get("del") or 0
+                    f = files.setdefault(cl["target"], [0, 0])
+                    f[0] += e.get("add") or 0
+                    f[1] += e.get("del") or 0
             if k == "fail": cl.update(state="fail", t1=e["ts"], err=e.get("err", "failed")); st["fails"] += 1
         if not aid and k in ("prompt", "start", "ok", "fail", "stop", "end", "session") or (k == "notify" and e.get("ntype") in ASKS):
             st["last"] = e
@@ -159,7 +169,8 @@ def group(ids, calls):
     """merge repeats: same step n times → one row ×n; several reads/searches in a row → one row"""
     rows = []
     for i in ids:
-        cl = calls[i]; verb = kind(cl["tool"])[2]
+        cl = calls[i]
+        verb = kind(cl["tool"])[2]
         prev = rows[-1] if rows else None
         if prev and prev["verb"] == verb and prev["target"] == cl["target"] and prev["state"] == cl["state"] and verb != "agent":
             prev["n"] += 1; prev["last"] = i; continue
@@ -169,7 +180,8 @@ def group(ids, calls):
     return rows
 
 def row_line(r, calls, agents, now, width, narrow, cwd, gut=" "):
-    cl = calls[r["last"]]; icon, col, verb = kind(cl["tool"])
+    cl = calls[r["last"]]
+    icon, col, verb = kind(cl["tool"])
     if len(r["files"]) > 1:
         target = f"{len(r['files'])} files" if verb in ("read", "find") else f"{len(r['files'])} searches"
     elif verb == "agent":
@@ -185,7 +197,7 @@ def row_line(r, calls, agents, now, width, narrow, cwd, gut=" "):
     return f"{pre}{fit(target, tw):<{tw}} {res}"
 
 # ---------- screen ----------
-def render(sid, path):
+def render(sid: str | None, path: str | None) -> tuple[list[str], bool]:
     now = time.time()
     cols, rows = shutil.get_terminal_size((80, 30))
     width = max(20, min(cols - 1, 72)); narrow = width < 54; lw = 6 if narrow else 8
@@ -295,7 +307,10 @@ def main():
     if not ({"--timeline", "--last"} & set(sys.argv)):     # default: the code pane, like an editor next to Claude
         import codeview; codeview.main(); return
     if "--last" in sys.argv:
-        sid, path = latest_session(); lines, _ = render(sid, path); print(term_safe("\n".join(lines))); return
+        sid, path = latest_session()
+        lines, _ = render(sid, path)
+        print(term_safe("\n".join(lines)))
+        return
     sys.stdout.write("\x1b[?25l\x1b[2J")
     seen, active = None, False
     try:
@@ -304,7 +319,9 @@ def main():
             try: mt = (sid, os.path.getmtime(path) if path else 0, os.path.getmtime(CACHE) if os.path.exists(CACHE) else 0, shutil.get_terminal_size())
             except OSError: mt = None
             if mt != seen or active:          # idle: nothing redraws, nothing runs
-                lines, active = render(sid, path); draw(lines); seen = mt
+                lines, active = render(sid, path)
+                draw(lines)
+                seen = mt
             time.sleep(1.0 if active else 0.5)
     except KeyboardInterrupt: pass
     finally: sys.stdout.write("\x1b[?25h\n"); sys.stdout.flush()

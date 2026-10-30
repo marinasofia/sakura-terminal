@@ -4,6 +4,7 @@
    hub.py <name>          one chat in detail (any part of its title or folder)
    hub.py --hours 48      look further back
 Reads only the private sakura logs and Claude's chat logs. Prints plain text, sized to be cheap to read."""
+from __future__ import annotations
 import os, re, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +29,7 @@ SECRETS = [(re.compile(p), r) for p, r in [
     ('(://[^/:@\\s]*:)[^@\\s]+@', '\\1•••@'),
 ]]
 
-def mask(t):
+def mask(t: str | None) -> str:
     t = t or ""
     for rx, rep in SECRETS: t = rx.sub(rep, t)
     return t
@@ -42,11 +43,12 @@ def state(s):
     if s["lastk"] == "stop": return "done, waiting for the user"
     running = [c for c in s["calls"].values() if c["state"] == "run" and not c["aid"]]
     if running:
-        c = running[-1]; _, verb = cv.kind(c["tool"], c["target"])
+        c = running[-1]
+        _, verb = cv.kind(c["tool"], c["target"])
         return f"working: {verb} {os.path.basename(c['path']) if c['path'] else mask(c['target'])[:60]} ({int(time.time() - c['t0'])}s)"
     return "working: thinking"
 
-def summary(s, detail=False):
+def summary(s: dict, detail: bool = False) -> list[str]:
     calls = [s["calls"][i] for i in s["order"]]
     edits = {p: f for p, f in s["files"].items() if f["edits"]}
     reads = [p for p, f in s["files"].items() if f["reads"] and not f["edits"]]
@@ -94,7 +96,9 @@ def main():
     args = sys.argv[1:]
     hours = 12
     if "--hours" in args:
-        i = args.index("--hours"); hours = float(args[i + 1]); del args[i:i + 2]
+        i = args.index("--hours")
+        hours = float(args[i + 1])
+        del args[i:i + 2]
     chats = cv.sessions(window=hours * 3600)
     here = "all chats" if not args else f"chats matching “{' '.join(args)}”"
     if args:

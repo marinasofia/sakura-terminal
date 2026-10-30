@@ -2,6 +2,7 @@
 """✿ code view: the IDE pane for Ghostty. Shows the file Claude is reading or editing right now,
 with new lines in green and removed lines in red, plus its helpers, the files it touched and the
 websites it visited. Uses no tokens: it only reads the hook log. Opened by `work`, or type `live`."""
+from __future__ import annotations
 import difflib, json, os, re, shutil, subprocess, sys, time
 
 HOME = os.path.expanduser("~")
@@ -59,7 +60,7 @@ def guess_path(tool, target, cwd):
     return os.path.join(cwd, target) if cwd and not target.startswith("~") else None
 
 _sessions_cache = {}
-def sessions(window=QUIET):
+def sessions(window: float = QUIET) -> list[dict]:
     """every recent chat, newest activity first (parsed again only when a log changes)"""
     now, out = time.time(), []
     try: key = tuple(sorted((n, os.path.getmtime(os.path.join(LIVE, n))) for n in os.listdir(LIVE) if n.endswith(".jsonl")))
@@ -101,7 +102,7 @@ def choose(chats, here, pin):
         return (m, busy, c["last"])
     return max(chats, key=score) if chats else None
 
-def ingest(s, e):
+def ingest(s: dict, e: dict) -> None:
     k, ts, aid = e.get("k"), e.get("ts", 0), e.get("aid")
     if k == "session": s.update(calls={}, order=[], helpers={}, files={}, web=[], lastk=None, turn=None)
     s["cwd"] = e.get("cwd") or s["cwd"]; s["last"] = max(s["last"], ts)
@@ -415,7 +416,7 @@ def code_rows(call):
     return rows, None
 
 # ---------- screen ----------
-def render(here, pin=None, ctx_show=None, reveal=None):
+def render(here: str, pin: str | None = None, ctx_show: bool | None = None, reveal: int | None = None) -> tuple:
     """reveal: how many changed lines to show so far (None = all). New steps play in line by line."""
     cols, lines = shutil.get_terminal_size((90, 40))
     width, now = max(30, cols - 1), time.time()

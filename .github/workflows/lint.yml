@@ -1,18 +1,11 @@
-name: lint
+name: ci
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   lint:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: brew install shellcheck
-      - run: shellcheck -S warning install.sh uninstall.sh claude/hooks/*.sh claude/statusline.sh
-      - run: for f in sakura/*.zsh zshrc-block.zsh; do zsh -n "$f"; done
-      - run: python3 -m py_compile sakura/live.py
-      - run: brew install lua && cd tests && lua test_live.lua && lua test_panel.lua && lua test_pet.lua
-      - run: shellcheck -S warning tests/run.sh docs/make-gifs/*.sh
-      - run: python3 -m py_compile sakura/replay.py
-      - run: python3 -m py_compile sakura/codeview.py && python3 tests/test_codeview.py
-      - run: python3 -m py_compile sakura/hub.py sakura/tokens.py && python3 tests/test_tools.py
-      - run: shellcheck -S warning claude/hooks/guard.sh claude/hooks/nudge.sh
-      - run: shellcheck -S warning tests/test_uninstall.sh tests/test_install.sh && bash tests/test_uninstall.sh && bash tests/test_install.sh
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: brew install shellcheck lua
+      - run: tests/all.sh

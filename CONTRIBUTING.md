@@ -4,17 +4,13 @@ Thanks for wanting to make Sakura better. Small, focused pull requests are easie
 
 ## Run the checks
 
-Everything CI runs, locally:
+Everything CI runs, locally (needs `brew install shellcheck lua`):
 
 ```bash
-shellcheck -S warning install.sh uninstall.sh claude/hooks/*.sh claude/statusline.sh tests/*.sh docs/make-gifs/*.sh
-for f in sakura/*.zsh zshrc-block.zsh; do zsh -n "$f"; done
-tests/run.sh                        # Lua: live state, panel, pet (Hammerspoon's Lua works too)
-python3 tests/test_codeview.py      # the code pane
-python3 tests/test_tools.py         # hooks, redaction, hub, tokens, ask
-bash tests/test_uninstall.sh        # uninstall removes only what install added
-bash tests/test_install.sh          # install on awkward setups: spaces, links, empty or commented settings
+tests/all.sh
 ```
+
+It runs shellcheck on every shell script, `zsh -n` on the zsh files, the Lua suites in `tests/run.sh` (Hammerspoon's Lua works too), `tests/test_codeview.py`, `tests/test_tools.py`, `tests/test_uninstall.sh` and `tests/test_install.sh`. Each one can be run on its own.
 
 The Lua tests run against `tests/fake_hs.lua`, a strict stand in for Hammerspoon. If you use a new Hammerspoon call, add it there, behaving like the real one.
 
